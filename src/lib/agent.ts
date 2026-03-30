@@ -24,14 +24,15 @@ const AgentState = Annotation.Root({
   upsellSuggestions: Annotation<string[]>(), // New field for extra budget ideas
 });
 
-const model = new ChatGroq({
-  apiKey: process.env.GROQ_API_KEY,
-  model: "llama-3.3-70b-versatile",
-  temperature: 0.2,
-});
+// Nodes for the agent
 
 // Node 1: Predict Costs
 async function predictCosts(state: typeof AgentState.State) {
+  const model = new ChatGroq({
+    apiKey: process.env.GROQ_API_KEY,
+    model: "llama-3.3-70b-versatile",
+    temperature: 0.2,
+  });
   const { origin, destination, budgetClass, startDate, endDate, maxBudget } = state;
   const duration = Math.floor(
     (new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)
@@ -72,6 +73,11 @@ async function predictCosts(state: typeof AgentState.State) {
 
 // Node 2: Generate Itinerary
 async function generateItinerary(state: typeof AgentState.State) {
+  const model = new ChatGroq({
+    apiKey: process.env.GROQ_API_KEY,
+    model: "llama-3.3-70b-versatile",
+    temperature: 0.2,
+  });
   const { origin, destination, budgetClass, weatherForecast, startDate, endDate } = state;
   const duration = Math.floor(
     (new Date(endDate).getTime() - new Date(startDate).getTime()) / (1000 * 60 * 60 * 24)

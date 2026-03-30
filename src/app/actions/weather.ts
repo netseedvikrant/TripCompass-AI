@@ -5,13 +5,13 @@ import { ChatGroq } from "@langchain/groq";
 const API_KEY = process.env.OPENWEATHER_API_KEY;
 const BASE_URL = "https://api.openweathermap.org/data/2.5";
 
-const model = new ChatGroq({
-  apiKey: process.env.GROQ_API_KEY,
-  model: "llama-3.3-70b-versatile",
-  temperature: 0.1,
-});
-
 export async function getForecastForDates(city: string, startDate: string, endDate: string) {
+  const model = new ChatGroq({
+    apiKey: process.env.GROQ_API_KEY,
+    model: "llama-3.3-70b-versatile",
+    temperature: 0.1,
+  });
+
   const start = new Date(startDate);
   const end = new Date(endDate);
   const today = new Date();
