@@ -1,0 +1,24 @@
+TripCompass AI: System Documentation & Deployment Guide
+
+1. Framework: Next.js 14+ (App Router), TypeScript
+2. Styling: Tailwind CSS 4, Framer Motion (Translucent UI)
+3. AI Engine: Groq API (High-speed Llama models)
+4. Weather API: OpenWeatherMap (5-day forecasts)
+5. Core Tools: 
+   - html-to-image (Capture generator)
+   - tripAgent (Intelligence orchestrator)
+   - Lucide React (Icons)
+
+How it works:
+- Takes travel dates, origin/destination, and budget to build a plan.
+- Fetches real weather and maps it to specific AI-curated activities.
+- Calculates a 4-tier cost breakdown (Flights, Stay, Dining, Tours).
+
+Limitations:
+- Weather is limited to 5 days on the free tier.
+- This is a planning advisor, not a direct booking platform.
+
+Deployment (100% Free):
+- Vercel (vercel.com) is the best choice for Next.js apps.
+- Connect your GitHub and deploy in one click.
+- Add your GROQ_API_KEY and OPEN_WEATHER_API_KEY to Vercel environment variables.
