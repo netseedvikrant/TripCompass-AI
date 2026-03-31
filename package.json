@@ -13,6 +13,7 @@
     "@langchain/groq": "^1.1.5",
     "@langchain/langgraph": "^1.2.6",
     "clsx": "^2.1.1",
+    "csv-parse": "^6.2.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.38.0",
     "html-to-image": "^1.11.13",

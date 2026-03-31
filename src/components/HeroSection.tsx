@@ -7,7 +7,8 @@ import { format } from "date-fns";
 import { DayPicker, DateRange } from "react-day-picker";
 import "react-day-picker/style.css";
 import { cn } from "@/lib/utils";
-import { GLOBAL_CITIES } from "@/lib/cities";
+import { searchCities } from "@/app/actions/cities";
+import { useEffect, useRef } from "react";
 
 interface HeroSectionProps {
   onSearch: (data: {
@@ -36,9 +37,36 @@ const AutocompleteInput = ({
   label: string 
 }) => {
   const [showDropdown, setShowDropdown] = useState(false);
-  const suggestions = GLOBAL_CITIES.filter(c => 
-    c.toLowerCase().includes(value.toLowerCase()) && value.length > 1
-  ).slice(0, 5);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (value.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+
+    searchTimeout.current = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const results = await searchCities(value);
+        setSuggestions(results);
+      } catch (error) {
+        console.error("Search failed:", error);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 300);
+
+    return () => {
+      if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    };
+  }, [value]);
 
   return (
     <div className="flex-1 relative">
@@ -61,26 +89,33 @@ const AutocompleteInput = ({
         </div>
       </div>
       <AnimatePresence>
-        {showDropdown && suggestions.length > 0 && (
+        {showDropdown && (suggestions.length > 0 || isSearching) && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
             className="absolute top-full left-0 right-0 mt-2 z-50 glass rounded-2xl overflow-hidden shadow-2xl border-white/20"
           >
-            {suggestions.map((city) => (
-              <button
-                key={city}
-                className="w-full text-left px-6 py-3 hover:bg-primary/20 transition-colors text-sm font-bold flex items-center gap-2"
-                onClick={() => {
-                  onChange(city);
-                  setShowDropdown(false);
-                }}
-              >
-                <MapPin className="w-4 h-4 text-primary" />
-                {city}
-              </button>
-            ))}
+            {isSearching ? (
+              <div className="px-6 py-4 flex items-center gap-2 text-sm text-foreground/40 font-bold">
+                <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                Searching...
+              </div>
+            ) : (
+              suggestions.map((city) => (
+                <button
+                  key={city}
+                  className="w-full text-left px-6 py-3 hover:bg-primary/20 transition-colors text-sm font-bold flex items-center gap-2"
+                  onClick={() => {
+                    onChange(city);
+                    setShowDropdown(false);
+                  }}
+                >
+                  <MapPin className="w-4 h-4 text-primary" />
+                  {city}
+                </button>
+              ))
+            )}
           </motion.div>
         )}
       </AnimatePresence>
