@@ -10,8 +10,8 @@ export async function searchCities(query: string): Promise<string[]> {
   if (!query || query.length < 2) return [];
 
   if (!cachedCities) {
-    const worldCitiesPath = path.join(process.cwd(), "worldcities.csv");
-    const indianCitiesPath = path.join(process.cwd(), "Indian_Cities.csv");
+    const worldCitiesPath = path.join(process.cwd(), "src", "lib", "data", "worldcities.csv");
+    const indianCitiesPath = path.join(process.cwd(), "src", "lib", "data", "Indian_Cities.csv");
 
     // Use a map to deduplicate by (City + Country)
     // Key: cityName|country, Value: full entry string
