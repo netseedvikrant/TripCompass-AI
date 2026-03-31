@@ -106,6 +106,7 @@ export default function Home() {
   const [budgetClass, setBudgetClass] = useState<"low" | "mid" | "high" | "luxury">("mid");
 
   const [upsellSuggestions, setUpsellSuggestions] = useState<string[]>([]);
+  const [downgradeSuggestions, setDowngradeSuggestions] = useState<string[]>([]);
 
   const handleSearch = async (data: {
     origin: string;
@@ -143,6 +144,7 @@ export default function Home() {
           setItinerary(agentRes.itinerary || []);
           setPredictedBreakdown(agentRes.predictedBreakdown || { flights: 0, stay: 0, food: 0, activities: 0 });
           setUpsellSuggestions(agentRes.upsellSuggestions || []);
+          setDowngradeSuggestions(agentRes.downgradeSuggestions || []);
         }
       }
     } catch (error) {
@@ -210,6 +212,7 @@ export default function Home() {
                       maxBudget={maxBudget}
                       isCalculating={isLoading}
                       upsellSuggestions={upsellSuggestions}
+                      downgradeSuggestions={downgradeSuggestions}
                       budgetClass={budgetClass}
                     />
                   </motion.div>

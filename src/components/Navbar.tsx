@@ -26,6 +26,7 @@ export default function Navbar() {
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
             <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">Planner</Link>
+            <Link href="/currency" className="text-sm font-medium hover:text-primary transition-colors">Currency Converter</Link>
             <Link href="/contact" className="text-sm font-medium hover:text-primary transition-colors">Reviews & Suggestions</Link>
           </div>
 
@@ -45,6 +46,7 @@ export default function Navbar() {
       <div className={cn("md:hidden glass", isOpen ? "block" : "hidden")}>
         <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
           <Link href="/" className="block px-3 py-2 text-base font-medium hover:text-primary">Planner</Link>
+          <Link href="/currency" className="block px-3 py-2 text-base font-medium hover:text-primary">Currency Converter</Link>
           <Link href="/contact" className="block px-3 py-2 text-base font-medium hover:text-primary">Reviews & Suggestions</Link>
         </div>
       </div>

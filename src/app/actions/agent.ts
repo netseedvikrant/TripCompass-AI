@@ -18,12 +18,14 @@ export async function runTripAgent(data: {
       (new Date(data.endDate).getTime() - new Date(data.startDate).getTime()) / (1000 * 60 * 60 * 24)
     ) + 1;
     
-    // Predicted breakdown based on class
+    const isDomestic = data.origin.toLowerCase().includes("india") && data.destination.toLowerCase().includes("india");
+    
+    // Predicted breakdown based on class (all in USD)
     const averages = {
-      low: { flights: 400, stay: 50, food: 30, activities: 20 },
-      mid: { flights: 800, stay: 150, food: 70, activities: 50 },
-      high: { flights: 1500, stay: 400, food: 150, activities: 120 },
-      luxury: { flights: 3000, stay: 1000, food: 300, activities: 250 },
+      low: { flights: isDomestic ? 100 : 400, stay: 50, food: 30, activities: 20 },
+      mid: { flights: isDomestic ? 200 : 800, stay: 150, food: 70, activities: 50 },
+      high: { flights: isDomestic ? 400 : 1500, stay: 400, food: 150, activities: 120 },
+      luxury: { flights: isDomestic ? 800 : 3000, stay: 1000, food: 300, activities: 250 },
     }[data.budgetClass];
 
     const predictedBreakdown = {
@@ -43,6 +45,11 @@ export async function runTripAgent(data: {
         "Upgrade to a private villa with pool",
         "Book a premium 5-course tasting menu",
         "Private chauffeur for city transfers"
+      ] : [],
+      downgradeSuggestions: totalPredicted > data.maxBudget ? [
+        "Switch to budget accommodations",
+        "Use local transport instead of private taxis",
+        "Look for free walking tours and public museums"
       ] : [],
       itinerary: Array.from({ length: duration }, (_, i) => ({
         day: i + 1,

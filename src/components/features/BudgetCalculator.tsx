@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { Plane, Hotel, Utensils, Activity, CreditCard, ChevronRight, ChevronDown, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { Plane, Hotel, Utensils, Activity, CreditCard, ChevronRight, ChevronDown, AlertTriangle, CheckCircle2, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface BudgetBreakdown {
@@ -16,6 +16,7 @@ interface BudgetCalculatorProps {
   maxBudget: number;
   isCalculating?: boolean;
   upsellSuggestions?: string[];
+  downgradeSuggestions?: string[];
   budgetClass?: "low" | "mid" | "high" | "luxury";
 }
 
@@ -39,6 +40,7 @@ export default function BudgetCalculator({
   maxBudget, 
   isCalculating, 
   upsellSuggestions = [],
+  downgradeSuggestions = [],
   budgetClass = "mid"
 }: BudgetCalculatorProps) {
   const getBudgetItemDetail = (type: keyof BudgetBreakdown) => {
@@ -148,15 +150,33 @@ export default function BudgetCalculator({
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 flex gap-3 items-start"
+              className="p-5 rounded-[2rem] bg-accent/10 border border-accent/20 flex flex-col gap-4 shadow-inner"
             >
-              <AlertTriangle className="w-5 h-5 text-red-500 shrink-0" />
-              <div className="space-y-1">
-                <p className="text-sm font-bold text-red-500 leading-none">Insufficient Funds</p>
-                <p className="text-xs text-red-500/70 leading-tight">
-                  This trip style requires at least ${total.toLocaleString()}. Please increase your budget or choose a lower style.
-                </p>
+              <div className="flex gap-3 items-start">
+                <div className="bg-accent/20 p-2 rounded-xl">
+                  <TrendingUp className="w-5 h-5 text-accent" />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm font-black text-accent leading-none">Budget Optimizer</p>
+                  <p className="text-[11px] text-accent/70 leading-tight font-bold">
+                    This selection is currently ${total - maxBudget} over your limit. Consider these optimizations to balance your trip:
+                  </p>
+                </div>
               </div>
+              
+              {downgradeSuggestions.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-[10px] font-black text-accent/40 uppercase tracking-[0.2em] ml-1">Optimization Suggestions</p>
+                  <ul className="space-y-2">
+                    {downgradeSuggestions.map((s, i) => (
+                      <li key={i} className="text-[11px] font-bold text-foreground/80 flex items-center gap-3 bg-white/5 p-2.5 rounded-xl border border-white/5">
+                        <span className="w-1.5 h-1.5 bg-accent rounded-full shadow-[0_0_8px_rgba(249,115,22,0.5)]" />
+                        {s}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </motion.div>
           ) : hasExtraBudget && upsellSuggestions.length > 0 ? (
             <motion.div

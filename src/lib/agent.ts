@@ -22,6 +22,7 @@ const AgentState = Annotation.Root({
   isSufficient: Annotation<boolean>(),
   totalPredicted: Annotation<number>(),
   upsellSuggestions: Annotation<string[]>(), // New field for extra budget ideas
+  downgradeSuggestions: Annotation<string[]>(), // New field for saving money ideas
 });
 
 // Nodes for the agent
@@ -40,11 +41,14 @@ async function predictCosts(state: typeof AgentState.State) {
 
   const prompt = `Act as a travel cost estimator. Predict the approximate expenses for a ${duration}-day trip from ${origin} to ${destination} for a "${budgetClass}" budget class.
   Provide a JSON object with: 
-  - flights: (estimated round trip for 1 person from ${origin} to ${destination})
-  - stay: (total for ${duration} nights)
-  - food: (total for ${duration} days)
-  - activities: (total for ${duration} days)
+  - flights: (estimated round trip for 1 person from ${origin} to ${destination} in US Dollars)
+  - stay: (total for ${duration} nights in US Dollars)
+  - food: (total for ${duration} days in US Dollars)
+  - activities: (total for ${duration} days in US Dollars)
   - upsellSuggestions: (Array of 3 strings offering luxury upgrades if the user has extra budget. Example: "Private Chef Dinner for $200")
+  - downgradeSuggestions: (Array of 3 strings offering cost-saving alternatives if the user is over budget. Example: "Switch to a 3-star hotel to save $300")
+  
+  IMPORTANT: All values MUST be in US Dollars (USD). If the trip is within a country that uses a different currency (like India), convert the market prices to USD appropriately.
   
   Be realistic based on current (2026) trends for trips starting in ${origin} and going to ${destination} for ${duration} days. 
   Return ONLY the JSON object.`;
@@ -68,6 +72,7 @@ async function predictCosts(state: typeof AgentState.State) {
     totalPredicted,
     isSufficient: totalPredicted <= maxBudget,
     upsellSuggestions: maxBudget > totalPredicted + 200 ? data.upsellSuggestions : [],
+    downgradeSuggestions: totalPredicted > maxBudget ? data.downgradeSuggestions : [],
   };
 }
 

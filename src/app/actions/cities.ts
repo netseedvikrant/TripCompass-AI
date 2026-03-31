@@ -13,7 +13,33 @@ export async function searchCities(query: string): Promise<string[]> {
     const worldCitiesPath = path.join(process.cwd(), "worldcities.csv");
     const indianCitiesPath = path.join(process.cwd(), "Indian_Cities.csv");
 
-    const citiesSet = new Set<string>();
+    // Use a map to deduplicate by (City + Country)
+    // Key: cityName|country, Value: full entry string
+    const citiesMap = new Map<string, string>();
+
+    function addCity(name: string, admin: string, country: string) {
+      const cityName = name.trim();
+      const countryName = country.trim();
+      const adminName = admin.trim();
+      
+      if (!cityName || !countryName) return;
+
+      const key = `${cityName.toLowerCase()}|${countryName.toLowerCase()}`;
+      const entry = adminName ? `${cityName}, ${adminName}, ${countryName}` : `${cityName}, ${countryName}`;
+
+      // If we already have this city/country, prefer the one with admin info
+      const existing = citiesMap.get(key);
+      if (!existing || (!existing.includes(",") && adminName)) {
+        // Simple heuristic: if existing is just "Delhi, India" and new is "Delhi, Delhi, India", replace
+        // Or if we have nothing, add it.
+        // Actually, more robust: if existing has 1 comma and new has 2, replace.
+        const existingCommas = (existing?.match(/,/g) || []).length;
+        const newCommas = (entry.match(/,/g) || []).length;
+        if (!existing || newCommas > existingCommas) {
+          citiesMap.set(key, entry);
+        }
+      }
+    }
 
     // Load World Cities
     if (fs.existsSync(worldCitiesPath)) {
@@ -25,13 +51,7 @@ export async function searchCities(query: string): Promise<string[]> {
       });
 
       worldRecords.forEach((r: any) => {
-        const cityName = (r.city_ascii || r.city || "").trim();
-        const country = (r.country || "").trim();
-        const admin = (r.admin_name || "").trim();
-        if (cityName && country) {
-          const entry = admin ? `${cityName}, ${admin}, ${country}` : `${cityName}, ${country}`;
-          citiesSet.add(entry);
-        }
+        addCity(r.city_ascii || r.city, r.admin_name, r.country);
       });
     }
 
@@ -45,17 +65,11 @@ export async function searchCities(query: string): Promise<string[]> {
       });
 
       indianRecords.forEach((r: any) => {
-        const cityName = (r.City || "").trim();
-        const country = (r.country || "India").trim();
-        const state = (r.State || "").trim();
-        if (cityName) {
-          const entry = state ? `${cityName}, ${state}, ${country}` : `${cityName}, ${country}`;
-          citiesSet.add(entry);
-        }
+        addCity(r.City, r.State, r.country || "India");
       });
     }
 
-    cachedCities = Array.from(citiesSet);
+    cachedCities = Array.from(citiesMap.values());
   }
 
   const lowercaseQuery = query.toLowerCase();
